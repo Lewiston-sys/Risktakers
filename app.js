@@ -12,7 +12,7 @@ ws.onopen = () => {
 ws.onmessage = (event) => {
   const data = JSON.parse(event.data);
   if (data.tick) {
-    console.log("R_100 price:", data.tick.quote);
+    document.getElementById("price").textContent = data.tick.quote;
   }
 };
 
