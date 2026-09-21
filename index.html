@@ -22,7 +22,17 @@ function connectDeriv() {
   <h2>Markets</h2>
   <div>
   <h3>Volatility 100</h3>
-  <p id="price">Loading price...</p>
+  <label for="symbol">Choose Volatility Index:</label>
+
+<select id="symbol">
+  <option value="R_10">Volatility 10</option>
+  <option value="R_25">Volatility 25</option>
+  <option value="R_50">Volatility 50</option>
+  <option value="R_75">Volatility 75</option>
+  <option value="R_100" selected>Volatility 100</option>
+</select>
+
+<p id="price">Loading price...</p>
 </div>
   <p>Volatility Indices</p>
   <p>Forex</p>
