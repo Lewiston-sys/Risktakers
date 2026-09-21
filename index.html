@@ -28,5 +28,26 @@ function connectDeriv() {
   <p>Forex</p>
   <p>Commodities</p>
   <script src="app.js"></script>
+  <script>
+const socket = new WebSocket(
+  "wss://api.derivws.com/trading/v1/options/ws/public"
+);
+
+socket.onopen = () => {
+  console.log("Connected to Deriv API");
+};
+
+socket.onmessage = (event) => {
+  console.log("Deriv:", event.data);
+};
+
+socket.onerror = (error) => {
+  console.error("Deriv connection error:", error);
+};
+
+socket.onclose = () => {
+  console.log("Deriv connection closed");
+};
+</script>
 </body>
 </html>
