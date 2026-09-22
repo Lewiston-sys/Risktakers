@@ -5,6 +5,44 @@ const ws = new WebSocket(
 const symbolSelector = document.getElementById("symbol");
 const priceElement = document.getElementById("price");
 
+const prices = [];
+const times = [];
+const maxPoints = 30;
+
+const ctx = document.getElementById("priceChart").getContext("2d");
+
+const priceChart = new Chart(ctx, {
+  type: "line",
+  data: {
+    labels: times,
+    datasets: [{
+      label: "Live Price",
+      data: prices,
+      borderWidth: 2,
+      fill: false,
+      tension: 0.2
+    }]
+  },
+  options: {
+    responsive: true,
+    animation: false,
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: "Time"
+        }
+      },
+      y: {
+        title: {
+          display: true,
+          text: "Price"
+        }
+      }
+    }
+  }
+});
+
 ws.onopen = () => {
   console.log("Connected to Deriv API");
 
@@ -23,19 +61,32 @@ function subscribeToSymbol(symbol) {
 ws.onmessage = (event) => {
   const data = JSON.parse(event.data);
 
-  console.log("Deriv:", data);
-
   if (data.tick) {
-    priceElement.textContent = data.tick.quote;
+    const price = data.tick.quote;
+
+    priceElement.textContent = price;
+
+    prices.push(price);
+    times.push(new Date().toLocaleTimeString());
+
+    if (prices.length > maxPoints) {
+      prices.shift();
+      times.shift();
+    }
+
+    priceChart.update();
   }
 };
 
 symbolSelector.addEventListener("change", () => {
-  const selectedSymbol = symbolSelector.value;
+  prices.length = 0;
+  times.length = 0;
+
+  priceChart.update();
 
   priceElement.textContent = "Loading price...";
 
-  subscribeToSymbol(selectedSymbol);
+  subscribeToSymbol(symbolSelector.value);
 });
 
 ws.onerror = (error) => {
