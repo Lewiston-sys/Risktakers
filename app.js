@@ -96,3 +96,41 @@ ws.onerror = (error) => {
 ws.onclose = () => {
   console.log("Deriv connection closed");
 };
+document.getElementById("connectDeriv").addEventListener("click", async () => {
+  const clientId = "34tOJPGjcSXYqZY1dKPcx";
+  const redirectUri = "https://risktakers.lmugo476.workers.dev/callback";
+
+  const array = crypto.getRandomValues(new Uint8Array(64));
+  const codeVerifier = Array.from(array)
+    .map(v => "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~"[v % 66])
+    .join("");
+
+  const hash = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(codeVerifier)
+  );
+
+  const codeChallenge = btoa(
+    String.fromCharCode(...new Uint8Array(hash))
+  )
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+
+  const state = crypto.randomUUID();
+
+  sessionStorage.setItem("code_verifier", codeVerifier);
+  sessionStorage.setItem("oauth_state", state);
+
+  const authUrl = new URL("https://auth.deriv.com/oauth2/auth");
+
+  authUrl.searchParams.set("response_type", "code");
+  authUrl.searchParams.set("client_id", clientId);
+  authUrl.searchParams.set("redirect_uri", redirectUri);
+  authUrl.searchParams.set("scope", "trade");
+  authUrl.searchParams.set("state", state);
+  authUrl.searchParams.set("code_challenge", codeChallenge);
+  authUrl.searchParams.set("code_challenge_method", "S256");
+
+  window.location.href = authUrl.toString();
+});
